@@ -41,7 +41,7 @@ html, body, [class*="css"] {
     font-family: 'Inter', sans-serif;
 }
 
-/* Hide Streamlit Branding */
+/* Hide Streamlit */
 
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
@@ -54,7 +54,7 @@ header {visibility: hidden;}
     padding-top: 2rem;
 }
 
-/* Hero Section */
+/* Hero */
 
 .hero-title {
     font-size: 72px;
@@ -120,7 +120,7 @@ header {visibility: hidden;}
     line-height: 1.6;
 }
 
-/* File Cards */
+/* File Card */
 
 .file-card {
     background: rgba(15,23,42,0.95);
@@ -129,40 +129,6 @@ header {visibility: hidden;}
     padding: 28px;
     margin-top: 15px;
     margin-bottom: 25px;
-}
-
-.file-name {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 14px;
-    color: white;
-}
-
-.file-meta {
-    color: #94a3b8;
-    margin-bottom: 10px;
-    font-size: 16px;
-}
-
-.open-btn {
-    display: inline-block;
-    padding: 12px 20px;
-    border-radius: 14px;
-    background: linear-gradient(135deg,#a855f7,#3b82f6);
-    color: white !important;
-    text-decoration: none;
-    font-weight: 600;
-    margin-top: 12px;
-}
-
-/* Remove Code Block Styling */
-
-pre {
-    display: none !important;
-}
-
-code {
-    white-space: pre-wrap !important;
 }
 
 /* Chat Input */
@@ -293,21 +259,42 @@ for msg in st.session_state.messages:
             st.markdown(f"""
             <div class="file-card">
 
-                <div class="file-name">
+                <h2 style="
+                    margin-bottom:15px;
+                    color:white;
+                    font-size:34px;
+                    font-weight:700;
+                ">
                     📄 {file_name}
-                </div>
+                </h2>
 
-                <div class="file-meta">
+                <p style="
+                    color:#94a3b8;
+                    font-size:16px;
+                    margin-bottom:10px;
+                ">
                     Type: {file_type}
-                </div>
+                </p>
 
-                <div class="file-meta">
+                <p style="
+                    color:#94a3b8;
+                    font-size:16px;
+                    margin-bottom:20px;
+                ">
                     Modified: {modified}
-                </div>
+                </p>
 
-                <a class="open-btn"
-                   href="{link}"
-                   target="_blank">
+                <a href="{link}"
+                   target="_blank"
+                   style="
+                        display:inline-block;
+                        padding:12px 20px;
+                        border-radius:14px;
+                        background:linear-gradient(135deg,#a855f7,#3b82f6);
+                        color:white;
+                        text-decoration:none;
+                        font-weight:600;
+                   ">
                    Open File
                 </a>
 
