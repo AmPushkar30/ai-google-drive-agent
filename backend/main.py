@@ -10,7 +10,11 @@ app = FastAPI()
 class ChatRequest(BaseModel):
     message: str
 
-
+@app.get("/")
+def home():
+    return {
+        "message": "AI Google Drive Agent is running successfully"
+    }
 # ---------------------------------------------------------
 # SEARCH KEYWORDS
 # ---------------------------------------------------------
