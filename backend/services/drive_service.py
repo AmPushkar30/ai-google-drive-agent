@@ -1,17 +1,24 @@
-from googleapiclient.discovery import build
+import os
+import json
+
 from google.oauth2 import service_account
+from googleapiclient.discovery import build
 
-SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 
-SERVICE_ACCOUNT_FILE = 'credentials/service_account.json'
+SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 
 def get_drive_service():
-    credentials = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE,
+
+    service_account_info = json.loads(
+        os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
+    )
+
+    credentials = service_account.Credentials.from_service_account_info(
+        service_account_info,
         scopes=SCOPES
     )
 
-    service = build('drive', 'v3', credentials=credentials)
+    service = build("drive", "v3", credentials=credentials)
 
     return service
