@@ -1,519 +1,298 @@
-import requests
 import streamlit as st
+import requests
 import os
+from datetime import datetime
 
-# ---------------------------------------------------------
+# =========================
+# PAGE CONFIG
+# =========================
+
+st.set_page_config(
+    page_title="AI Google Drive Agent",
+    page_icon="✨",
+    layout="wide"
+)
+
+# =========================
 # BACKEND URL
-# ---------------------------------------------------------
+# =========================
 
 BACKEND_URL = os.getenv(
     "BACKEND_URL",
     "https://ai-google-drive-agent.onrender.com"
 )
 
-# ---------------------------------------------------------
-# PAGE CONFIG
-# ---------------------------------------------------------
-
-st.set_page_config(
-    page_title="AI Drive Agent",
-    page_icon="📁",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
-
-# ---------------------------------------------------------
+# =========================
 # SESSION STATE
-# ---------------------------------------------------------
+# =========================
 
-if "history" not in st.session_state:
-    st.session_state.history = []
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-if "current_chat" not in st.session_state:
-    st.session_state.current_chat = None
-
-# ---------------------------------------------------------
-# CSS
-# ---------------------------------------------------------
+# =========================
+# CUSTOM CSS
+# =========================
 
 st.markdown("""
 <style>
 
-#MainMenu {
-    visibility: hidden;
-}
-
-footer {
-    visibility: hidden;
-}
-
-header {
-    visibility: hidden;
-}
-
-html,
-body,
-[data-testid="stAppViewContainer"] {
-    background: radial-gradient(circle at top, #0f172a 0%, #050816 55%);
+html, body, [class*="css"]  {
+    background-color: #020617;
     color: white;
+    font-family: 'Inter', sans-serif;
 }
+
+/* Hide Streamlit */
+
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+
+/* Main Container */
 
 .block-container {
-    max-width: 1150px;
-    padding-top: 1rem;
-    padding-bottom: 2rem;
+    padding-top: 2rem;
+    max-width: 1100px;
 }
 
-/* NAVBAR */
-
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-
-.logo {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: white;
-}
-
-.right-nav {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    color: #9ca3af;
-}
-
-.online {
-    color: #22c55e;
-}
-
-/* HERO */
-
-.hero {
-    text-align: center;
-    margin-top: 3rem;
-    margin-bottom: 2rem;
-}
+/* Hero */
 
 .hero-title {
-    font-size: 4.3rem;
+    font-size: 72px;
     font-weight: 800;
+    text-align: center;
+    line-height: 1.1;
     background: linear-gradient(90deg,#a855f7,#60a5fa);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-.hero-subtitle {
-    color: #9ca3af;
-    font-size: 1.1rem;
-    margin-top: 1rem;
+.hero-sub {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 22px;
+    margin-top: 15px;
+    margin-bottom: 60px;
 }
 
-/* SECTION TITLE */
+/* Quick Search */
 
-.section-title {
-    font-size: 1.5rem;
+.quick-title {
+    font-size: 22px;
     font-weight: 700;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
+    margin-bottom: 20px;
 }
 
-/* QUICK SEARCH */
+/* User Bubble */
 
-.tip-btn button {
-    background: rgba(17,24,39,0.8) !important;
-    border: 1px solid rgba(255,255,255,0.06) !important;
-    border-radius: 18px !important;
-    padding: 1rem !important;
-    width: 100% !important;
-    text-align: center !important;
-    height: 70px !important;
-    color: white !important;
-    transition: 0.3s !important;
-    font-size: 1rem !important;
-    font-weight: 600 !important;
+.user-wrap {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+    margin-bottom: 15px;
 }
 
-.tip-btn button:hover {
-    border: 1px solid #8b5cf6 !important;
-    transform: translateY(-2px);
+.user-bubble {
+    background: linear-gradient(135deg,#a855f7,#3b82f6);
+    padding: 18px 22px;
+    border-radius: 20px;
+    color: white;
+    max-width: 420px;
+    font-size: 17px;
+    font-weight: 500;
 }
 
-/* FILE CARD */
+/* AI Bubble */
 
-.result-card {
-    background: rgba(17,24,39,0.75);
+.ai-wrap {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 25px;
+}
+
+.ai-bubble {
+    background: rgba(15,23,42,0.9);
     border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 18px;
-    padding: 1.2rem;
-    margin-top: 1rem;
+    padding: 18px 22px;
+    border-radius: 20px;
+    color: white;
+    max-width: 650px;
+    font-size: 17px;
+    line-height: 1.6;
 }
 
-.file-title {
-    font-size: 1.1rem;
-    font-weight: 600;
+/* File Card */
+
+.file-card {
+    background: rgba(15,23,42,0.95);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 24px;
+    padding: 28px;
+    margin-top: 18px;
+    margin-bottom: 18px;
+}
+
+.file-name {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 12px;
 }
 
 .file-meta {
-    color: #9ca3af;
-    margin-top: 0.4rem;
+    color: #94a3b8;
+    margin-bottom: 10px;
+    font-size: 16px;
 }
 
 .open-btn {
     display: inline-block;
-    margin-top: 1rem;
-    background: linear-gradient(90deg,#8b5cf6,#3b82f6);
-    padding: 0.7rem 1rem;
-    border-radius: 10px;
+    padding: 12px 20px;
+    border-radius: 14px;
+    background: linear-gradient(135deg,#a855f7,#3b82f6);
     color: white !important;
     text-decoration: none;
     font-weight: 600;
+    margin-top: 10px;
 }
 
-/* CHAT INPUT */
+/* Input */
 
 .stChatInputContainer {
-    background: rgba(17,24,39,0.85) !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
-    border-radius: 18px !important;
-}
-
-/* MOBILE */
-
-@media(max-width: 900px) {
-
-    .hero-title {
-        font-size: 3rem;
-    }
-}
-
-@media(max-width: 600px) {
-
-    .hero-title {
-        font-size: 2.2rem;
-    }
+    background: #020617;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# NAVBAR
-# ---------------------------------------------------------
+# =========================
+# HEADER
+# =========================
 
 st.markdown("""
-<div class="topbar">
-
-<div class="logo">
-📁 AI Drive Agent
-</div>
-
-<div class="right-nav">
-ℹ️ About
-<span class="online">● Online</span>
-</div>
-
+<div style="text-align:center; margin-top:30px;">
+    <div class="hero-title">✨ AI Google Drive Agent</div>
+    <div class="hero-sub">
+        Conversational AI system for intelligent file discovery and semantic Google Drive search.
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# HERO
-# ---------------------------------------------------------
-
-st.markdown("""
-<div class="hero">
-
-<div class="hero-title">
-✨ AI Google Drive Agent
-</div>
-
-<div class="hero-subtitle">
-Conversational AI system for intelligent file discovery and semantic Google Drive search.
-</div>
-
-</div>
-""", unsafe_allow_html=True)
-
-# ---------------------------------------------------------
+# =========================
 # QUICK SEARCHES
-# ---------------------------------------------------------
+# =========================
 
-st.markdown("""
-<div class="section-title">
-💡 Quick Searches
-</div>
-""", unsafe_allow_html=True)
-
-quick_queries = [
-    ("📄 Find PDFs", "Find PDF reports"),
-    ("🖼️ Find Images", "Find image files"),
-    ("🧾 Find Invoices", "Find invoice documents"),
-    ("📊 Find Reports", "Find report files")
-]
-
-selected_query = None
-
-cols = st.columns(4)
-
-for i, (title, query_text) in enumerate(quick_queries):
-
-    with cols[i]:
-
-        st.markdown(
-            '<div class="tip-btn">',
-            unsafe_allow_html=True
-        )
-
-        if st.button(title, key=query_text):
-            selected_query = query_text
-
-        st.markdown(
-            '</div>',
-            unsafe_allow_html=True
-        )
-
-# ---------------------------------------------------------
-# CHAT INPUT
-# ---------------------------------------------------------
-
-user_input = st.chat_input(
-    "Ask about your Google Drive files..."
+st.markdown(
+    '<div class="quick-title">💡 Quick Searches</div>',
+    unsafe_allow_html=True
 )
 
-if selected_query:
-    user_input = selected_query
+c1, c2, c3, c4 = st.columns(4)
 
-# ---------------------------------------------------------
-# SEND REQUEST
-# ---------------------------------------------------------
+with c1:
+    if st.button("📄 Find PDFs", use_container_width=True):
+        query = "find pdf files"
+
+with c2:
+    if st.button("🖼️ Find Images", use_container_width=True):
+        query = "find images"
+
+with c3:
+    if st.button("🧾 Find Invoices", use_container_width=True):
+        query = "find invoices"
+
+with c4:
+    if st.button("📊 Find Reports", use_container_width=True):
+        query = "find reports"
+
+# =========================
+# CHAT INPUT
+# =========================
+
+user_input = st.chat_input("Ask about your Google Drive files...")
 
 if user_input:
+    query = user_input
+
+# =========================
+# SEND QUERY
+# =========================
+
+if "query" in locals():
 
     try:
 
         response = requests.post(
             f"{BACKEND_URL}/chat",
-            json={
-                "message": user_input
-            },
-            timeout=60
+            json={"message": query}
         )
-
-        # -------------------------------------------------
-        # DEBUG RESPONSE
-        # -------------------------------------------------
-
-        # st.write("STATUS:", response.status_code)
-
-        # st.write("RAW RESPONSE:")
-        # st.write(response.text)
-
-        # -------------------------------------------------
-        # HANDLE ERROR
-        # -------------------------------------------------
-
-        if response.status_code != 200:
-
-            st.error(response.text)
-            st.stop()
-
-        # -------------------------------------------------
-        # PARSE JSON
-        # -------------------------------------------------
 
         data = response.json()
 
-        # -------------------------------------------------
-        # SAVE CHAT
-        # -------------------------------------------------
-
-        current_chat = {
-            "question": user_input,
+        st.session_state.messages.append({
+            "user": query,
             "reply": data.get("reply", ""),
-            "results": data.get("results", []),
-            "is_search": data.get("is_search", False)
-        }
-
-        # SAVE OLD CHAT TO HISTORY
-
-        if st.session_state.current_chat is not None:
-
-            st.session_state.history.insert(
-                0,
-                st.session_state.current_chat
-            )
-
-        # SET CURRENT CHAT
-
-        st.session_state.current_chat = current_chat
+            "results": data.get("results", [])
+        })
 
     except Exception as e:
 
-        st.error(str(e))
+        st.session_state.messages.append({
+            "user": query,
+            "reply": f"Error: {str(e)}",
+            "results": []
+        })
 
-# ---------------------------------------------------------
-# SHOW CURRENT CHAT
-# ---------------------------------------------------------
+# =========================
+# CHAT FEED
+# =========================
 
-if st.session_state.current_chat:
-
-    item = st.session_state.current_chat
-
-    st.markdown("""
-<div class="section-title">
-✨ Latest Chat
-</div>
-""", unsafe_allow_html=True)
+for msg in st.session_state.messages:
 
     # USER MESSAGE
 
     st.markdown(f"""
-<div style="
-display:flex;
-justify-content:flex-end;
-margin-bottom:14px;
-">
+    <div class="user-wrap">
+        <div class="user-bubble">
+            {msg["user"]}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-<div style="
-background:linear-gradient(90deg,#8b5cf6,#3b82f6);
-padding:14px 18px;
-border-radius:18px 18px 4px 18px;
-max-width:70%;
-font-size:16px;
-font-weight:500;
-color:white;
-box-shadow:0 0 20px rgba(139,92,246,0.2);
-">
-
-{item['question']}
-
-</div>
-
-</div>
-""", unsafe_allow_html=True)
-
-    # BOT MESSAGE
+    # AI REPLY
 
     st.markdown(f"""
-<div style="
-display:flex;
-justify-content:flex-start;
-margin-bottom:18px;
-">
+    <div class="ai-wrap">
+        <div class="ai-bubble">
+            🤖 {msg["reply"]}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-<div style="
-background:rgba(17,24,39,0.85);
-border:1px solid rgba(255,255,255,0.06);
-padding:16px 18px;
-border-radius:18px 18px 18px 4px;
-max-width:75%;
-font-size:16px;
-line-height:1.7;
-color:#d1d5db;
-">
+    # FILES
 
-🤖 {item['reply']}
+    if msg["results"]:
 
-</div>
+        for file in msg["results"]:
 
-</div>
-""", unsafe_allow_html=True)
-
-    # FILE RESULTS
-
-    if item["is_search"]:
-
-        results = item["results"]
-
-        if len(results) > 0:
-
-            st.markdown("""
-<div class="section-title">
-📂 Matching Files
-</div>
-""", unsafe_allow_html=True)
-
-            for file in results:
-
-                st.markdown(f"""
-<div class="result-card">
-
-<div class="file-title">
-📄 {file['name']}
-</div>
-
-<div class="file-meta">
-<b>Type:</b> {file['mimeType']}
-</div>
-
-<div class="file-meta">
-<b>Modified:</b> {file['modifiedTime']}
-</div>
-
-<a class="open-btn"
-href="{file['webViewLink']}"
-target="_blank">
-Open File
-</a>
-
-</div>
-""", unsafe_allow_html=True)
-
-# ---------------------------------------------------------
-# CHAT HISTORY
-# ---------------------------------------------------------
-
-if st.session_state.history:
-
-    with st.expander("🕘 Chat History"):
-
-        for item in st.session_state.history:
+            file_name = file.get("name", "Unknown File")
+            file_type = file.get("mimeType", "Unknown")
+            modified = file.get("modifiedTime", "")
+            link = file.get("webViewLink", "#")
 
             st.markdown(f"""
-<div style="
-display:flex;
-justify-content:flex-end;
-margin-bottom:10px;
-">
+            <div class="file-card">
+                <div class="file-name">📄 {file_name}</div>
 
-<div style="
-background:linear-gradient(90deg,#8b5cf6,#3b82f6);
-padding:12px 16px;
-border-radius:18px 18px 4px 18px;
-max-width:70%;
-color:white;
-">
+                <div class="file-meta">
+                    Type: {file_type}
+                </div>
 
-{item['question']}
+                <div class="file-meta">
+                    Modified: {modified}
+                </div>
 
-</div>
-
-</div>
-""", unsafe_allow_html=True)
-
-            st.markdown(f"""
-<div style="
-display:flex;
-justify-content:flex-start;
-margin-bottom:18px;
-">
-
-<div style="
-background:rgba(17,24,39,0.85);
-border:1px solid rgba(255,255,255,0.06);
-padding:14px 16px;
-border-radius:18px 18px 18px 4px;
-max-width:75%;
-color:#d1d5db;
-">
-
-🤖 {item['reply']}
-
-</div>
-
-</div>
-""", unsafe_allow_html=True)
+                <a class="open-btn" href="{link}" target="_blank">
+                    Open File
+                </a>
+            </div>
+            """, unsafe_allow_html=True)
