@@ -322,7 +322,7 @@ if "query" in locals():
 
         st.session_state.messages.append({
             "user": query,
-            "reply": data.get("reply", ""),
+            "reply": str(data.get("reply", "")),
             "results": data.get("results", [])
         })
 
@@ -340,7 +340,7 @@ if "query" in locals():
 
 for msg in st.session_state.messages:
 
-    # USER
+    # USER MESSAGE
 
     st.markdown(f"""
     <div class="user-wrap">
@@ -350,12 +350,18 @@ for msg in st.session_state.messages:
     </div>
     """, unsafe_allow_html=True)
 
-    # AI
+    # CLEAN AI REPLY
+
+    clean_reply = msg["reply"]
+    clean_reply = clean_reply.replace("<", "&lt;")
+    clean_reply = clean_reply.replace(">", "&gt;")
+
+    # AI MESSAGE
 
     st.markdown(f"""
     <div class="ai-wrap">
         <div class="ai-bubble">
-            🤖 {msg["reply"]}
+            🤖 {clean_reply}
         </div>
     </div>
     """, unsafe_allow_html=True)
