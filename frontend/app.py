@@ -36,7 +36,7 @@ st.markdown("""
 <style>
 
 html, body, [class*="css"] {
-    background-color: #020617;
+    background: radial-gradient(circle at top, #0f172a 0%, #020617 45%);
     color: white;
     font-family: 'Inter', sans-serif;
 }
@@ -47,115 +47,230 @@ html, body, [class*="css"] {
 footer {visibility: hidden;}
 header {visibility: hidden;}
 
-/* Main Layout */
+/* Main Container */
 
 .block-container {
-    max-width: 1100px;
-    padding-top: 2rem;
+    max-width: 1150px;
+    padding-top: 1rem;
+}
+
+/* Navbar */
+
+.navbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:40px;
+}
+
+.logo {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-size:20px;
+    font-weight:700;
+}
+
+.logo-icon {
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    background:linear-gradient(135deg,#a855f7,#3b82f6);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+}
+
+.nav-right {
+    display:flex;
+    align-items:center;
+    gap:25px;
+    color:#94a3b8;
+}
+
+.online-dot {
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#22c55e;
+    display:inline-block;
 }
 
 /* Hero */
 
+.hero {
+    text-align:center;
+    margin-top:40px;
+    margin-bottom:60px;
+}
+
 .hero-title {
-    font-size: 72px;
-    font-weight: 800;
-    text-align: center;
-    line-height: 1.1;
-    background: linear-gradient(90deg,#a855f7,#60a5fa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size:72px;
+    font-weight:800;
+    line-height:1.1;
+    background: linear-gradient(90deg,#c084fc,#60a5fa);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
 }
 
 .hero-sub {
-    text-align: center;
-    color: #94a3b8;
-    font-size: 22px;
-    margin-top: 15px;
-    margin-bottom: 60px;
+    margin-top:20px;
+    color:#94a3b8;
+    font-size:24px;
 }
 
 /* Quick Search */
 
 .quick-title {
-    font-size: 22px;
-    font-weight: 700;
-    margin-bottom: 20px;
+    font-size:24px;
+    font-weight:700;
+    margin-bottom:25px;
+}
+
+/* Buttons */
+
+.stButton button {
+    background: rgba(15,23,42,0.95);
+    border:1px solid rgba(255,255,255,0.08);
+    color:white;
+    border-radius:16px;
+    padding:14px 20px;
+    font-size:17px;
+    font-weight:600;
+    transition:0.3s;
+}
+
+.stButton button:hover {
+    border:1px solid #8b5cf6;
+    transform:translateY(-2px);
 }
 
 /* User Bubble */
 
 .user-wrap {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 30px;
-    margin-bottom: 15px;
+    display:flex;
+    justify-content:flex-end;
+    margin-top:30px;
+    margin-bottom:15px;
 }
 
 .user-bubble {
-    background: linear-gradient(135deg,#a855f7,#3b82f6);
-    padding: 18px 22px;
-    border-radius: 20px;
-    color: white;
-    max-width: 420px;
-    font-size: 17px;
-    font-weight: 500;
+    background:linear-gradient(135deg,#a855f7,#3b82f6);
+    padding:18px 22px;
+    border-radius:20px;
+    color:white;
+    max-width:420px;
+    font-size:17px;
+    font-weight:500;
 }
 
 /* AI Bubble */
 
 .ai-wrap {
-    display: flex;
-    justify-content: flex-start;
-    margin-bottom: 18px;
+    display:flex;
+    justify-content:flex-start;
+    margin-bottom:20px;
 }
 
 .ai-bubble {
-    background: rgba(15,23,42,0.95);
-    border: 1px solid rgba(255,255,255,0.06);
-    padding: 18px 22px;
-    border-radius: 20px;
-    color: white;
-    max-width: 650px;
-    font-size: 17px;
-    line-height: 1.6;
+    background:rgba(15,23,42,0.95);
+    border:1px solid rgba(255,255,255,0.06);
+    padding:18px 22px;
+    border-radius:20px;
+    color:white;
+    max-width:650px;
+    font-size:17px;
+    line-height:1.6;
 }
 
-/* File Card */
+/* File Cards */
 
 .file-card {
     background: rgba(15,23,42,0.95);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 24px;
-    padding: 28px;
-    margin-top: 15px;
-    margin-bottom: 25px;
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:24px;
+    padding:28px;
+    margin-top:15px;
+    margin-bottom:25px;
+}
+
+.file-name {
+    font-size:32px;
+    font-weight:700;
+    margin-bottom:14px;
+}
+
+.file-meta {
+    color:#94a3b8;
+    margin-bottom:10px;
+    font-size:16px;
+}
+
+.open-btn {
+    display:inline-block;
+    padding:12px 20px;
+    border-radius:14px;
+    background:linear-gradient(135deg,#a855f7,#3b82f6);
+    color:white !important;
+    text-decoration:none;
+    font-weight:600;
+    margin-top:12px;
 }
 
 /* Chat Input */
 
 .stChatInputContainer {
-    background: #020617;
+    background:#020617;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
 # =========================
-# HEADER
+# NAVBAR
 # =========================
 
 st.markdown("""
-<div style="text-align:center; margin-top:30px;">
-    <div class="hero-title">✨ AI Google Drive Agent</div>
+<div class="navbar">
 
-    <div class="hero-sub">
-        Conversational AI system for intelligent file discovery and semantic Google Drive search.
+    <div class="logo">
+        <div class="logo-icon">📁</div>
+        AI Drive Agent
     </div>
+
+    <div class="nav-right">
+        <span>ⓘ About</span>
+
+        <div style="display:flex;align-items:center;gap:8px;">
+            <span class="online-dot"></span>
+            Online
+        </div>
+    </div>
+
 </div>
 """, unsafe_allow_html=True)
 
 # =========================
-# QUICK SEARCH
+# HERO
+# =========================
+
+st.markdown("""
+<div class="hero">
+
+    <div class="hero-title">
+        ✨ AI Google Drive Agent
+    </div>
+
+    <div class="hero-sub">
+        Conversational AI system for intelligent file discovery and semantic Google Drive search.
+    </div>
+
+</div>
+""", unsafe_allow_html=True)
+
+# =========================
+# QUICK SEARCHES
 # =========================
 
 st.markdown(
@@ -225,7 +340,7 @@ if "query" in locals():
 
 for msg in st.session_state.messages:
 
-    # USER MESSAGE
+    # USER
 
     st.markdown(f"""
     <div class="user-wrap">
@@ -235,7 +350,7 @@ for msg in st.session_state.messages:
     </div>
     """, unsafe_allow_html=True)
 
-    # AI MESSAGE
+    # AI
 
     st.markdown(f"""
     <div class="ai-wrap">
@@ -259,43 +374,22 @@ for msg in st.session_state.messages:
             st.markdown(f"""
             <div class="file-card">
 
-                <h2 style="
-                    margin-bottom:15px;
-                    color:white;
-                    font-size:34px;
-                    font-weight:700;
-                ">
+                <div class="file-name">
                     📄 {file_name}
-                </h2>
+                </div>
 
-                <p style="
-                    color:#94a3b8;
-                    font-size:16px;
-                    margin-bottom:10px;
-                ">
+                <div class="file-meta">
                     Type: {file_type}
-                </p>
+                </div>
 
-                <p style="
-                    color:#94a3b8;
-                    font-size:16px;
-                    margin-bottom:20px;
-                ">
+                <div class="file-meta">
                     Modified: {modified}
-                </p>
+                </div>
 
-                <a href="{link}"
-                   target="_blank"
-                   style="
-                        display:inline-block;
-                        padding:12px 20px;
-                        border-radius:14px;
-                        background:linear-gradient(135deg,#a855f7,#3b82f6);
-                        color:white;
-                        text-decoration:none;
-                        font-weight:600;
-                   ">
-                   Open File
+                <a class="open-btn"
+                   href="{link}"
+                   target="_blank">
+                    Open File
                 </a>
 
             </div>
