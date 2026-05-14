@@ -106,7 +106,7 @@ header {visibility: hidden;}
 .ai-wrap {
     display: flex;
     justify-content: flex-start;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .ai-bubble {
@@ -128,13 +128,14 @@ header {visibility: hidden;}
     border-radius: 24px;
     padding: 28px;
     margin-top: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .file-name {
     font-size: 28px;
     font-weight: 700;
     margin-bottom: 14px;
+    color: white;
 }
 
 .file-meta {
@@ -154,7 +155,17 @@ header {visibility: hidden;}
     margin-top: 12px;
 }
 
-/* Input */
+/* Remove Code Block Styling */
+
+pre {
+    display: none !important;
+}
+
+code {
+    white-space: pre-wrap !important;
+}
+
+/* Chat Input */
 
 .stChatInputContainer {
     background: #020617;
@@ -243,7 +254,7 @@ if "query" in locals():
         })
 
 # =========================
-# CHAT DISPLAY
+# CONTINUOUS CHAT
 # =========================
 
 for msg in st.session_state.messages:
@@ -279,7 +290,7 @@ for msg in st.session_state.messages:
             modified = file.get("modifiedTime", "")
             link = file.get("webViewLink", "#")
 
-            file_html = f"""
+            st.markdown(f"""
             <div class="file-card">
 
                 <div class="file-name">
@@ -297,10 +308,8 @@ for msg in st.session_state.messages:
                 <a class="open-btn"
                    href="{link}"
                    target="_blank">
-                    Open File
+                   Open File
                 </a>
 
             </div>
-            """
-
-            st.markdown(file_html, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
