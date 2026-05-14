@@ -1,5 +1,15 @@
 import requests
 import streamlit as st
+import os
+
+# ---------------------------------------------------------
+# BACKEND URL
+# ---------------------------------------------------------
+
+BACKEND_URL = os.getenv(
+    "BACKEND_URL",
+    "https://ai-google-drive-agent.onrender.com"
+)
 
 # ---------------------------------------------------------
 # PAGE CONFIG
@@ -288,7 +298,7 @@ if user_input:
         try:
 
             response = requests.post(
-                "http://127.0.0.1:8000/chat",
+                f"{BACKEND_URL}/chat",
                 json={
                     "message": user_input
                 }
