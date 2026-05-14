@@ -1,7 +1,6 @@
 import streamlit as st
 import requests
 import os
-from datetime import datetime
 
 # =========================
 # PAGE CONFIG
@@ -268,7 +267,7 @@ for msg in st.session_state.messages:
     </div>
     """, unsafe_allow_html=True)
 
-    # FILES
+    # FILE RESULTS
 
     if msg["results"]:
 
@@ -279,9 +278,12 @@ for msg in st.session_state.messages:
             modified = file.get("modifiedTime", "")
             link = file.get("webViewLink", "#")
 
-            st.markdown(f"""
+            file_html = f"""
             <div class="file-card">
-                <div class="file-name">📄 {file_name}</div>
+
+                <div class="file-name">
+                    📄 {file_name}
+                </div>
 
                 <div class="file-meta">
                     Type: {file_type}
@@ -291,8 +293,13 @@ for msg in st.session_state.messages:
                     Modified: {modified}
                 </div>
 
-                <a class="open-btn" href="{link}" target="_blank">
-                    Open File
+                <a class="open-btn"
+                   href="{link}"
+                   target="_blank">
+                   Open File
                 </a>
+
             </div>
-            """, unsafe_allow_html=True)
+            """
+
+            st.markdown(file_html, unsafe_allow_html=True)
