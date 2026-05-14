@@ -23,6 +23,16 @@ st.set_page_config(
 )
 
 # ---------------------------------------------------------
+# SESSION STATE
+# ---------------------------------------------------------
+
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+if "current_chat" not in st.session_state:
+    st.session_state.current_chat = None
+
+# ---------------------------------------------------------
 # CSS
 # ---------------------------------------------------------
 
@@ -90,7 +100,7 @@ body,
 }
 
 .hero-title {
-    font-size: 4.2rem;
+    font-size: 4.3rem;
     font-weight: 800;
     background: linear-gradient(90deg,#a855f7,#60a5fa);
     -webkit-background-clip: text;
@@ -103,11 +113,11 @@ body,
     margin-top: 1rem;
 }
 
-/* SECTION */
+/* SECTION TITLE */
 
 .section-title {
-    font-size: 1.4rem;
-    font-weight: 600;
+    font-size: 1.5rem;
+    font-weight: 700;
     margin-top: 2rem;
     margin-bottom: 1rem;
 }
@@ -133,7 +143,7 @@ body,
     transform: translateY(-2px);
 }
 
-/* RESULT CARD */
+/* FILE CARD */
 
 .result-card {
     background: rgba(17,24,39,0.75);
@@ -157,7 +167,7 @@ body,
     display: inline-block;
     margin-top: 1rem;
     background: linear-gradient(90deg,#8b5cf6,#3b82f6);
-    padding: 0.6rem 1rem;
+    padding: 0.7rem 1rem;
     border-radius: 10px;
     color: white !important;
     text-decoration: none;
@@ -229,33 +239,23 @@ Conversational AI system for intelligent file discovery and semantic Google Driv
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# SESSION STATE
-# ---------------------------------------------------------
-
-if "history" not in st.session_state:
-    st.session_state.history = []
-
-if "current_search" not in st.session_state:
-    st.session_state.current_search = None
-
-# ---------------------------------------------------------
 # QUICK SEARCHES
 # ---------------------------------------------------------
-
-quick_queries = [
-    ("📄 Find PDFs", "Find PDF reports"),
-    ("🖼️ Find Images", "Show image files"),
-    ("🧾 Find Invoices", "Find invoice documents"),
-    ("📊 Find Reports", "Find report files")
-]
-
-selected_query = None
 
 st.markdown("""
 <div class="section-title">
 💡 Quick Searches
 </div>
 """, unsafe_allow_html=True)
+
+quick_queries = [
+    ("📄 Find PDFs", "Find PDF reports"),
+    ("🖼️ Find Images", "Find image files"),
+    ("🧾 Find Invoices", "Find invoice documents"),
+    ("📊 Find Reports", "Find report files")
+]
+
+selected_query = None
 
 cols = st.columns(4)
 
@@ -288,59 +288,80 @@ if selected_query:
     user_input = selected_query
 
 # ---------------------------------------------------------
-# API REQUEST
+# SEND REQUEST
 # ---------------------------------------------------------
 
 if user_input:
 
-    with st.spinner("Thinking..."):
+    try:
 
-        try:
+        response = requests.post(
+            f"{BACKEND_URL}/chat",
+            json={
+                "message": user_input
+            },
+            timeout=60
+        )
 
-            response = requests.post(
-                f"{BACKEND_URL}/chat",
-                json={
-                    "message": user_input
-                }
+        # -------------------------------------------------
+        # DEBUG RESPONSE
+        # -------------------------------------------------
+
+        st.write("STATUS:", response.status_code)
+
+        st.write("RAW RESPONSE:")
+        st.write(response.text)
+
+        # -------------------------------------------------
+        # HANDLE ERROR
+        # -------------------------------------------------
+
+        if response.status_code != 200:
+
+            st.error(response.text)
+            st.stop()
+
+        # -------------------------------------------------
+        # PARSE JSON
+        # -------------------------------------------------
+
+        data = response.json()
+
+        # -------------------------------------------------
+        # SAVE CHAT
+        # -------------------------------------------------
+
+        current_chat = {
+            "question": user_input,
+            "reply": data.get("reply", ""),
+            "results": data.get("results", []),
+            "is_search": data.get("is_search", False)
+        }
+
+        # SAVE OLD CHAT TO HISTORY
+
+        if st.session_state.current_chat is not None:
+
+            st.session_state.history.insert(
+                0,
+                st.session_state.current_chat
             )
 
-            data = response.json()
+        # SET CURRENT CHAT
 
-            reply = data.get("reply", "")
-            results = data.get("results", [])
-            is_search = data.get("is_search", False)
+        st.session_state.current_chat = current_chat
 
-            search_data = {
-                "question": user_input,
-                "reply": reply,
-                "results": results,
-                "is_search": is_search
-            }
+    except Exception as e:
 
-            # SAVE OLD CHAT TO HISTORY
-
-            if st.session_state.current_search is not None:
-
-                st.session_state.history.insert(
-                    0,
-                    st.session_state.current_search
-                )
-
-            # SAVE CURRENT CHAT
-
-            st.session_state.current_search = search_data
-
-        except Exception as e:
-
-            st.error(str(e))
+        st.error(str(e))
 
 # ---------------------------------------------------------
-# CURRENT CHAT
+# SHOW CURRENT CHAT
 # ---------------------------------------------------------
 
-if st.session_state.current_search:
+if st.session_state.current_chat:
 
-    item = st.session_state.current_search
+    item = st.session_state.current_chat
 
     st.markdown("""
 <div class="section-title">
@@ -375,7 +396,7 @@ box-shadow:0 0 20px rgba(139,92,246,0.2);
 </div>
 """, unsafe_allow_html=True)
 
-    # AI RESPONSE
+    # BOT MESSAGE
 
     st.markdown(f"""
 <div style="
@@ -408,13 +429,7 @@ color:#d1d5db;
 
         results = item["results"]
 
-        if len(results) == 0:
-
-            st.warning(
-                "No matching files found."
-            )
-
-        else:
+        if len(results) > 0:
 
             st.markdown("""
 <div class="section-title">
@@ -449,7 +464,7 @@ Open File
 """, unsafe_allow_html=True)
 
 # ---------------------------------------------------------
-# HISTORY
+# CHAT HISTORY
 # ---------------------------------------------------------
 
 if st.session_state.history:
@@ -457,8 +472,6 @@ if st.session_state.history:
     with st.expander("🕘 Chat History"):
 
         for item in st.session_state.history:
-
-            # USER
 
             st.markdown(f"""
 <div style="
@@ -481,8 +494,6 @@ color:white;
 
 </div>
 """, unsafe_allow_html=True)
-
-            # BOT
 
             st.markdown(f"""
 <div style="
