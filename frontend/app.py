@@ -307,10 +307,10 @@ if user_input:
         # DEBUG RESPONSE
         # -------------------------------------------------
 
-        st.write("STATUS:", response.status_code)
+        # st.write("STATUS:", response.status_code)
 
-        st.write("RAW RESPONSE:")
-        st.write(response.text)
+        # st.write("RAW RESPONSE:")
+        # st.write(response.text)
 
         # -------------------------------------------------
         # HANDLE ERROR
