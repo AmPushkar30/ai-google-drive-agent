@@ -35,26 +35,26 @@ if "messages" not in st.session_state:
 st.markdown("""
 <style>
 
-html, body, [class*="css"]  {
+html, body, [class*="css"] {
     background-color: #020617;
     color: white;
     font-family: 'Inter', sans-serif;
 }
 
-/* Hide Streamlit */
+/* Hide Streamlit Branding */
 
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 header {visibility: hidden;}
 
-/* Main Container */
+/* Main Layout */
 
 .block-container {
-    padding-top: 2rem;
     max-width: 1100px;
+    padding-top: 2rem;
 }
 
-/* Hero */
+/* Hero Section */
 
 .hero-title {
     font-size: 72px;
@@ -106,11 +106,11 @@ header {visibility: hidden;}
 .ai-wrap {
     display: flex;
     justify-content: flex-start;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .ai-bubble {
-    background: rgba(15,23,42,0.9);
+    background: rgba(15,23,42,0.95);
     border: 1px solid rgba(255,255,255,0.06);
     padding: 18px 22px;
     border-radius: 20px;
@@ -120,21 +120,21 @@ header {visibility: hidden;}
     line-height: 1.6;
 }
 
-/* File Card */
+/* File Cards */
 
 .file-card {
     background: rgba(15,23,42,0.95);
     border: 1px solid rgba(255,255,255,0.06);
     border-radius: 24px;
     padding: 28px;
-    margin-top: 18px;
-    margin-bottom: 18px;
+    margin-top: 15px;
+    margin-bottom: 20px;
 }
 
 .file-name {
     font-size: 28px;
     font-weight: 700;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
 .file-meta {
@@ -151,7 +151,7 @@ header {visibility: hidden;}
     color: white !important;
     text-decoration: none;
     font-weight: 600;
-    margin-top: 10px;
+    margin-top: 12px;
 }
 
 /* Input */
@@ -170,6 +170,7 @@ header {visibility: hidden;}
 st.markdown("""
 <div style="text-align:center; margin-top:30px;">
     <div class="hero-title">✨ AI Google Drive Agent</div>
+
     <div class="hero-sub">
         Conversational AI system for intelligent file discovery and semantic Google Drive search.
     </div>
@@ -177,7 +178,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================
-# QUICK SEARCHES
+# QUICK SEARCH
 # =========================
 
 st.markdown(
@@ -213,7 +214,7 @@ if user_input:
     query = user_input
 
 # =========================
-# SEND QUERY
+# SEND REQUEST
 # =========================
 
 if "query" in locals():
@@ -242,7 +243,7 @@ if "query" in locals():
         })
 
 # =========================
-# CHAT FEED
+# CHAT DISPLAY
 # =========================
 
 for msg in st.session_state.messages:
@@ -257,7 +258,7 @@ for msg in st.session_state.messages:
     </div>
     """, unsafe_allow_html=True)
 
-    # AI REPLY
+    # AI MESSAGE
 
     st.markdown(f"""
     <div class="ai-wrap">
@@ -296,7 +297,7 @@ for msg in st.session_state.messages:
                 <a class="open-btn"
                    href="{link}"
                    target="_blank">
-                   Open File
+                    Open File
                 </a>
 
             </div>
