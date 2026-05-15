@@ -466,174 +466,57 @@ Open File
 </div>
 """, unsafe_allow_html=True)
 
-# =========================
-# CONTINUOUS CHAT
-# =========================
+# ---------------------------------------------------------
+# CHAT HISTORY
+# ---------------------------------------------------------
 
-if "messages" not in st.session_state:
-    st.session_state.messages = []
+if st.session_state.history:
 
-# Display old chat messages
-for msg in st.session_state.messages:
+    with st.expander("🕘 Chat History"):
 
-    if msg["role"] == "user":
+        for item in st.session_state.history:
 
-        st.markdown(
-            f"""
-            <div style="
-                display:flex;
-                justify-content:flex-end;
-                margin:16px 0;
-            ">
-                <div style="
-                    background:linear-gradient(135deg,#8b5cf6,#3b82f6);
-                    color:white;
-                    padding:14px 18px;
-                    border-radius:18px;
-                    max-width:320px;
-                    font-size:15px;
-                    font-weight:500;
-                ">
-                    {msg["content"]}
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+            st.markdown(f"""
+<div style="
+display:flex;
+justify-content:flex-end;
+margin-bottom:10px;
+">
 
-    else:
+<div style="
+background:linear-gradient(90deg,#8b5cf6,#3b82f6);
+padding:12px 16px;
+border-radius:18px 18px 4px 18px;
+max-width:70%;
+color:white;
+">
 
-        st.markdown(
-            f"""
-            <div style="
-                display:flex;
-                justify-content:flex-start;
-                margin:16px 0;
-            ">
-                <div style="
-                    background:rgba(255,255,255,0.04);
-                    border:1px solid rgba(255,255,255,0.06);
-                    color:white;
-                    padding:16px;
-                    border-radius:18px;
-                    max-width:700px;
-                    line-height:1.6;
-                ">
-                    {msg["content"]}
-                </div>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+{item['question']}
 
-# =========================
-# CHAT INPUT
-# =========================
+</div>
 
-query = st.chat_input("Ask about your Google Drive files...")
+</div>
+""", unsafe_allow_html=True)
 
-if query:
+            st.markdown(f"""
+<div style="
+display:flex;
+justify-content:flex-start;
+margin-bottom:18px;
+">
 
-    # Save user message
-    st.session_state.messages.append({
-        "role": "user",
-        "content": query
-    })
+<div style="
+background:rgba(17,24,39,0.85);
+border:1px solid rgba(255,255,255,0.06);
+padding:14px 16px;
+border-radius:18px 18px 18px 4px;
+max-width:75%;
+color:#d1d5db;
+">
 
-    try:
+🤖 {item['reply']}
 
-        response = requests.post(
-            f"{BACKEND_URL}/chat",
-            json={"message": query},
-            timeout=120
-        )
+</div>
 
-        if response.status_code != 200:
-
-            st.error(
-                "⚠️ Backend server is temporarily unavailable. Please try again in a few seconds."
-            )
-
-            st.stop()
-
-        data = response.json()
-
-        reply = data.get(
-            "reply",
-            "No response received."
-        )
-
-        results = data.get("results", [])
-
-        assistant_html = f"""
-        <div style="
-            margin-bottom:18px;
-            font-size:16px;
-        ">
-            🤖 {reply}
-        </div>
-        """
-
-        # File cards
-        for file in results:
-
-            assistant_html += f"""
-            <div style="
-                background:rgba(255,255,255,0.03);
-                border:1px solid rgba(255,255,255,0.06);
-                padding:20px;
-                border-radius:18px;
-                margin-bottom:18px;
-            ">
-                <div style="
-                    font-size:26px;
-                    font-weight:700;
-                    color:white;
-                    margin-bottom:14px;
-                ">
-                    📄 {file.get('name','Unknown File')}
-                </div>
-
-                <div style="
-                    color:#9ca3af;
-                    margin-bottom:8px;
-                ">
-                    Type: {file.get('mimeType','Unknown')}
-                </div>
-
-                <div style="
-                    color:#9ca3af;
-                    margin-bottom:18px;
-                ">
-                    Modified: {file.get('modifiedTime','Unknown')}
-                </div>
-
-                <a href="{file.get('webViewLink','#')}"
-                   target="_blank"
-                   style="
-                       background:linear-gradient(135deg,#8b5cf6,#3b82f6);
-                       color:white;
-                       text-decoration:none;
-                       padding:12px 18px;
-                       border-radius:12px;
-                       font-weight:600;
-                       display:inline-block;
-                   ">
-                   Open File
-                </a>
-            </div>
-            """
-
-        # Save assistant response
-        st.session_state.messages.append({
-            "role": "assistant",
-            "content": assistant_html
-        })
-
-        st.rerun()
-
-    except Exception:
-
-        st.error(
-            "⚠️ Unable to connect to backend server."
-        )
+</div>
+""", unsafe_allow_html=True)
