@@ -356,7 +356,7 @@ quick_queries = [
     ("📄 Find PDFs", "Find PDF reports"),
     ("🖼️ Find Images", "Find image files"),
     ("🧾 Find Invoices", "Find invoice documents"),
-    ("📊 Find Reports", "Find report files")
+    ("📊 Find Reports", "Find 'report' named files")
 ]
 
 selected_query = None
