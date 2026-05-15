@@ -26,11 +26,8 @@ st.set_page_config(
 # SESSION STATE
 # ---------------------------------------------------------
 
-if "history" not in st.session_state:
-    st.session_state.history = []
-
-if "current_chat" not in st.session_state:
-    st.session_state.current_chat = None
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
 # ---------------------------------------------------------
 # CSS
@@ -281,7 +278,8 @@ for i, (title, query_text) in enumerate(quick_queries):
 # ---------------------------------------------------------
 
 user_input = st.chat_input(
-    "Ask about your Google Drive files..."
+    "Ask about your Google Drive files...",
+    key="main_chat_input"
 )
 
 if selected_query:
@@ -293,6 +291,13 @@ if selected_query:
 
 if user_input:
 
+    # SAVE USER MESSAGE
+
+    st.session_state.messages.append({
+        "role": "user",
+        "content": user_input
+    })
+
     try:
 
         response = requests.post(
@@ -303,78 +308,56 @@ if user_input:
             timeout=60
         )
 
-        # -------------------------------------------------
-        # DEBUG RESPONSE
-        # -------------------------------------------------
-
-        # st.write("STATUS:", response.status_code)
-
-        # st.write("RAW RESPONSE:")
-        # st.write(response.text)
-
-        # -------------------------------------------------
         # HANDLE ERROR
-        # -------------------------------------------------
 
         if response.status_code != 200:
 
-            st.error(
-                "⚠️ Backend server is temporarily unavailable. Please try again in a few seconds."
-            )
+            st.session_state.messages.append({
+                "role": "assistant",
+                "content": "⚠️ Backend server is temporarily unavailable. Please try again in a few seconds.",
+                "results": [],
+                "is_search": False
+            })
 
-            st.stop()
+        else:
 
-        # -------------------------------------------------
-        # PARSE JSON
-        # -------------------------------------------------
+            data = response.json()
 
-        data = response.json()
+            st.session_state.messages.append({
+                "role": "assistant",
+                "content": data.get("reply", ""),
+                "results": data.get("results", []),
+                "is_search": data.get("is_search", False)
+            })
 
-        # -------------------------------------------------
-        # SAVE CHAT
-        # -------------------------------------------------
+    except Exception:
 
-        current_chat = {
-            "question": user_input,
-            "reply": data.get("reply", ""),
-            "results": data.get("results", []),
-            "is_search": data.get("is_search", False)
-        }
-
-        # SAVE OLD CHAT TO HISTORY
-
-        if st.session_state.current_chat is not None:
-
-            st.session_state.history.insert(
-                0,
-                st.session_state.current_chat
-            )
-
-        # SET CURRENT CHAT
-
-        st.session_state.current_chat = current_chat
-
-    except Exception as e:
-
-        st.error(str(e))
+        st.session_state.messages.append({
+            "role": "assistant",
+            "content": "⚠️ Unable to connect to backend server.",
+            "results": [],
+            "is_search": False
+        })
 
 # ---------------------------------------------------------
-# SHOW CURRENT CHAT
+# CONTINUOUS CHAT
 # ---------------------------------------------------------
 
-if st.session_state.current_chat:
-
-    item = st.session_state.current_chat
+if st.session_state.messages:
 
     st.markdown("""
 <div class="section-title">
-✨ Latest Chat
+✨ Chat
 </div>
 """, unsafe_allow_html=True)
 
-    # USER MESSAGE
+    for msg in st.session_state.messages:
 
-    st.markdown(f"""
+        # USER MESSAGE
+
+        if msg["role"] == "user":
+
+            st.markdown(f"""
 <div style="
 display:flex;
 justify-content:flex-end;
@@ -392,16 +375,18 @@ color:white;
 box-shadow:0 0 20px rgba(139,92,246,0.2);
 ">
 
-{item['question']}
+{msg['content']}
 
 </div>
 
 </div>
 """, unsafe_allow_html=True)
 
-    # BOT MESSAGE
+        # BOT MESSAGE
 
-    st.markdown(f"""
+        else:
+
+            st.markdown(f"""
 <div style="
 display:flex;
 justify-content:flex-start;
@@ -419,30 +404,30 @@ line-height:1.7;
 color:#d1d5db;
 ">
 
-🤖 {item['reply']}
+🤖 {msg['content']}
 
 </div>
 
 </div>
 """, unsafe_allow_html=True)
 
-    # FILE RESULTS
+            # FILE RESULTS
 
-    if item["is_search"]:
+            if msg.get("is_search"):
 
-        results = item["results"]
+                results = msg.get("results", [])
 
-        if len(results) > 0:
+                if len(results) > 0:
 
-            st.markdown("""
+                    st.markdown("""
 <div class="section-title">
 📂 Matching Files
 </div>
 """, unsafe_allow_html=True)
 
-            for file in results:
+                    for file in results:
 
-                st.markdown(f"""
+                        st.markdown(f"""
 <div class="result-card">
 
 <div class="file-title">
@@ -462,61 +447,6 @@ href="{file['webViewLink']}"
 target="_blank">
 Open File
 </a>
-
-</div>
-""", unsafe_allow_html=True)
-
-# ---------------------------------------------------------
-# CHAT HISTORY
-# ---------------------------------------------------------
-
-if st.session_state.history:
-
-    with st.expander("🕘 Chat History"):
-
-        for item in st.session_state.history:
-
-            st.markdown(f"""
-<div style="
-display:flex;
-justify-content:flex-end;
-margin-bottom:10px;
-">
-
-<div style="
-background:linear-gradient(90deg,#8b5cf6,#3b82f6);
-padding:12px 16px;
-border-radius:18px 18px 4px 18px;
-max-width:70%;
-color:white;
-">
-
-{item['question']}
-
-</div>
-
-</div>
-""", unsafe_allow_html=True)
-
-            st.markdown(f"""
-<div style="
-display:flex;
-justify-content:flex-start;
-margin-bottom:18px;
-">
-
-<div style="
-background:rgba(17,24,39,0.85);
-border:1px solid rgba(255,255,255,0.06);
-padding:14px 16px;
-border-radius:18px 18px 18px 4px;
-max-width:75%;
-color:#d1d5db;
-">
-
-🤖 {item['reply']}
-
-</div>
 
 </div>
 """, unsafe_allow_html=True)
