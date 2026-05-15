@@ -179,20 +179,127 @@ body,
     border-radius: 18px !important;
 }
 
-/* MOBILE */
+/* --------------------------------------------------------- */
+/* MOBILE OPTIMIZATION */
+/* --------------------------------------------------------- */
 
-@media(max-width: 900px) {
+@media(max-width: 768px) {
+
+    .block-container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-top: 0.5rem !important;
+    }
+
+    .topbar {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .logo {
+        font-size: 1.1rem;
+    }
+
+    .right-nav {
+        font-size: 0.9rem;
+        gap: 0.6rem;
+    }
+
+    .hero {
+        margin-top: 2rem;
+        margin-bottom: 1.5rem;
+    }
 
     .hero-title {
-        font-size: 3rem;
+        font-size: 2.3rem !important;
+        line-height: 1.2;
     }
+
+    .hero-subtitle {
+        font-size: 0.95rem;
+        line-height: 1.7;
+        padding: 0 10px;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+    }
+
+    /* QUICK SEARCH BUTTONS */
+
+    div[data-testid="column"] {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+
+    .tip-btn button {
+        height: 58px !important;
+        font-size: 0.95rem !important;
+        border-radius: 14px !important;
+        margin-bottom: 10px;
+    }
+
+    /* CHAT BUBBLES */
+
+    .user-msg,
+    .bot-msg {
+        max-width: 92% !important;
+        font-size: 15px !important;
+        line-height: 1.6 !important;
+    }
+
+    /* FILE CARDS */
+
+    .result-card {
+        padding: 1rem;
+        border-radius: 16px;
+    }
+
+    .file-title {
+        font-size: 1rem;
+        word-break: break-word;
+    }
+
+    .file-meta {
+        font-size: 0.9rem;
+    }
+
+    .open-btn {
+        width: 100%;
+        text-align: center;
+        padding: 0.85rem;
+        font-size: 0.95rem;
+    }
+
+    /* CHAT INPUT */
+
+    .stChatInputContainer {
+        border-radius: 14px !important;
+    }
+
 }
 
-@media(max-width: 600px) {
+/* EXTRA SMALL DEVICES */
+
+@media(max-width: 480px) {
 
     .hero-title {
-        font-size: 2.2rem;
+        font-size: 2rem !important;
     }
+
+    .hero-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .logo {
+        font-size: 1rem;
+    }
+
+    .right-nav {
+        font-size: 0.8rem;
+    }
+
 }
 
 </style>
